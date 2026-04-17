@@ -4,10 +4,34 @@ from django.contrib import messages
 from django.conf import settings
 from django.http import JsonResponse
 import pandas as pd
+import numpy as np
 import os
 import json
+from datetime import datetime
 from apps.authentication.models import ActivityLog
 from .ml_models import PlacementPredictor
+
+FIELD_LABELS = {
+    'cgpa': 'CGPA (0-10)',
+    'skills': 'Clinical Skills Score',
+    'internships': 'Internship Experience (months)',
+    'projects': 'Number of Clinical Projects',
+    'communication': 'Communication Score',
+}
+
+def parse_numeric_input(value, default=0.0):
+    if value is None:
+        return default
+    value = str(value).strip()
+    if value == '':
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        if ',' in value:
+            items = [item.strip() for item in value.split(',') if item.strip()]
+            return float(len(items))
+        return default
 
 @login_required
 def train_model(request):
@@ -97,50 +121,114 @@ def make_prediction(request):
     predictor = PlacementPredictor()
     predictor.load_model(model_path)
     
+    feature_names = predictor.feature_names or []
+    field_labels = {name: FIELD_LABELS.get(name, name.replace('_', ' ').title()) for name in feature_names}
+    feature_fields = [{'name': name, 'label': field_labels[name]} for name in feature_names]
+
     if request.method == 'POST':
-        # Get student data from form
+        # Get student data from form, using the model's trained feature set
         student_data = {}
-        
-        # Required fields
-        if 'cgpa' in request.POST:
-            student_data['cgpa'] = float(request.POST.get('cgpa', 0))
-        
-        if 'skills' in request.POST:
-            student_data['skills'] = request.POST.get('skills', '')
-        
+        for feature in feature_names:
+            student_data[feature] = parse_numeric_input(request.POST.get(feature, ''))
+
         if 'student_id' in request.POST:
             student_data['student_id'] = request.POST.get('student_id', '')
-        
+
         # Create DataFrame
         df = pd.DataFrame([student_data])
-        
+
         # Predict
         try:
             predictions = predictor.predict(df)
             prediction = predictions[0]
-            
+
             ActivityLog.objects.create(
                 user=request.user,
                 action='predict',
                 description=f'Predicted placement for student {student_data.get("student_id", "unknown")}',
                 metadata={
                     'student_data': student_data,
-                    'prediction': str(prediction)
+                    'prediction': prediction
                 }
             )
-            
+
+            # Save prediction record for later review
+            predictions_path = os.path.join(settings.MEDIA_ROOT, 'predictions.csv')
+            prediction_record = {
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'student_id': student_data.get('student_id', ''),
+                'prediction': prediction.get('prediction', ''),
+                'confidence': prediction.get('confidence', 0)
+            }
+            for feature in feature_names:
+                prediction_record[feature] = student_data.get(feature, '')
+            predictions_df = pd.DataFrame([prediction_record])
+            if os.path.exists(predictions_path):
+                predictions_df.to_csv(predictions_path, mode='a', header=False, index=False)
+            else:
+                os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+                predictions_df.to_csv(predictions_path, index=False)
+
+            messages.success(request, 'Prediction complete. The result has been saved.')
+            # Add values to feature_fields
+            for field in feature_fields:
+                field['value'] = student_data.get(field['name'], '')
+            student_id_value = student_data.get('student_id', '')
+            student_details = [(field['label'], student_data.get(field['name'], '')) for field in feature_fields]
             context = {
                 'prediction': prediction,
                 'show_result': True,
-                'student_data': student_data
+                'student_data': student_data,
+                'feature_fields': feature_fields,
+                'student_id_value': student_id_value,
+                'student_details': student_details
             }
             return render(request, 'ml_engine/predict.html', context)
         except Exception as e:
             messages.error(request, f'Error making prediction: {str(e)}')
-            return render(request, 'ml_engine/predict.html')
-    
+            # Add values to feature_fields
+            for field in feature_fields:
+                field['value'] = student_data.get(field['name'], '')
+            student_id_value = student_data.get('student_id', '')
+            student_details = [(field['label'], student_data.get(field['name'], '')) for field in feature_fields]
+            return render(request, 'ml_engine/predict.html', {
+                'student_data': student_data,
+                'feature_fields': feature_fields,
+                'student_id_value': student_id_value,
+                'student_details': student_details
+            })
+
     # GET request - show prediction form
-    return render(request, 'ml_engine/predict.html')
+    # Add empty values
+    for field in feature_fields:
+        field['value'] = ''
+    student_id_value = ''
+    student_details = [(field['label'], '') for field in feature_fields]
+    return render(request, 'ml_engine/predict.html', {
+        'student_data': {},
+        'feature_fields': feature_fields,
+        'student_id_value': student_id_value,
+        'student_details': student_details
+    })
+
+@login_required
+def prediction_history(request):
+    predictions_path = os.path.join(settings.MEDIA_ROOT, 'predictions.csv')
+    predictions = []
+    if os.path.exists(predictions_path):
+        try:
+            predictions_df = pd.read_csv(predictions_path)
+            if 'timestamp' in predictions_df.columns:
+                predictions_df = predictions_df.sort_values('timestamp', ascending=False)
+            predictions = predictions_df.to_dict('records')
+        except Exception as e:
+            messages.error(request, f'Unable to load prediction history: {str(e)}')
+
+    context = {
+        'predictions': predictions,
+        'has_predictions': len(predictions) > 0
+    }
+    return render(request, 'ml_engine/prediction_history.html', context)
 
 @login_required
 def list_models(request):

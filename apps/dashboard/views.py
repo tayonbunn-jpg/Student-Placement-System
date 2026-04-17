@@ -8,7 +8,32 @@ from datetime import datetime
 
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard/dashboard.html')
+    predictions_path = os.path.join(settings.MEDIA_ROOT, 'predictions.csv')
+    recent_predictions = []
+    prediction_summary = {
+        'total_predictions': 0,
+        'last_prediction': 'N/A'
+    }
+
+    if os.path.exists(predictions_path):
+        try:
+            pred_df = pd.read_csv(predictions_path)
+            pred_df['timestamp'] = pd.to_datetime(pred_df['timestamp'], errors='coerce')
+            pred_df = pred_df.sort_values('timestamp', ascending=False)
+            recent_predictions = pred_df.head(7).to_dict('records')
+            prediction_summary['total_predictions'] = len(pred_df)
+            prediction_summary['last_prediction'] = pred_df['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S') if not pred_df['timestamp'].isna().all() else 'N/A'
+        except Exception:
+            recent_predictions = []
+            prediction_summary = {
+                'total_predictions': 0,
+                'last_prediction': 'N/A'
+            }
+
+    return render(request, 'dashboard/dashboard.html', {
+        'recent_predictions': recent_predictions,
+        'prediction_summary': prediction_summary
+    })
 
 @login_required
 def get_dashboard_stats(request):
@@ -58,9 +83,26 @@ def get_dashboard_stats(request):
         placed_students = 98
         placement_rate = 65.33
         avg_cgpa = 7.8
+        feature_count = 0
         data_source = 'sample'
+        dataset_status = 'Sample Data'
+        dataset_updated_at = 'N/A'
     
     model_path = os.path.join(settings.MEDIA_ROOT, 'placement_model.pkl')
+    predictions_path = os.path.join(settings.MEDIA_ROOT, 'predictions.csv')
+    if os.path.exists(predictions_path):
+        try:
+            predictions_df = pd.read_csv(predictions_path)
+            prediction_count = len(predictions_df)
+            predictions_df['timestamp'] = pd.to_datetime(predictions_df['timestamp'], errors='coerce')
+            last_prediction = predictions_df['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S') if not predictions_df['timestamp'].isna().all() else 'N/A'
+        except Exception:
+            prediction_count = 0
+            last_prediction = 'N/A'
+    else:
+        prediction_count = 0
+        last_prediction = 'N/A'
+
     model_exists = os.path.exists(model_path)
     model_status = 'Trained' if model_exists else 'Not Trained'
     model_updated_at = datetime.fromtimestamp(os.path.getmtime(model_path)).strftime('%Y-%m-%d %H:%M:%S') if model_exists else 'N/A'
@@ -76,6 +118,8 @@ def get_dashboard_stats(request):
         'feature_count': feature_count,
         'class_distribution': class_distribution,
         'model_status': model_status,
-        'model_updated_at': model_updated_at
+        'model_updated_at': model_updated_at,
+        'prediction_count': prediction_count,
+        'last_prediction': last_prediction
     }
     return JsonResponse(data)

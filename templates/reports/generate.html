@@ -75,6 +75,7 @@
                         <select class="form-control" id="report_type" name="report_type" required>
                             <option value="placement_summary">Placement Summary</option>
                             <option value="student_details">Student Details</option>
+                            <option value="individual_student">Individual Student Report</option>
                             <option value="model_performance">Model Performance</option>
                         </select>
                     </div>
@@ -83,7 +84,12 @@
                         <select class="form-control" id="format" name="format" required>
                             <option value="csv">CSV</option>
                             <option value="json">JSON</option>
+                            <option value="pdf">PDF</option>
                         </select>
+                    </div>
+                    <div class="mb-3" id="student_id_field" style="display: none;">
+                        <label for="student_id" class="form-label">Student ID</label>
+                        <input type="text" class="form-control" id="student_id" name="student_id" placeholder="Enter Student ID">
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -106,5 +112,17 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('report_type').addEventListener('change', function() {
+            var studentField = document.getElementById('student_id_field');
+            if (this.value === 'individual_student') {
+                studentField.style.display = 'block';
+                document.getElementById('student_id').required = true;
+            } else {
+                studentField.style.display = 'none';
+                document.getElementById('student_id').required = false;
+            }
+        });
+    </script>
 </body>
 </html>

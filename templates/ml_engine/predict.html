@@ -111,21 +111,32 @@
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if message.tags == 'error' %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-{{ message.tags }}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     <div class="mb-3">
                         <label for="student_id" class="form-label">Student ID</label>
                         <input type="text" class="form-control" id="student_id" name="student_id" 
-                               value="{{ student_data.student_id }}" required>
+                               value="{{ student_id_value }}" required>
                     </div>
+                    {% for field in feature_fields %}
                     <div class="mb-3">
-                        <label for="cgpa" class="form-label">CGPA (0-10)</label>
-                        <input type="number" class="form-control" id="cgpa" name="cgpa" 
-                               step="0.01" min="0" max="10" required>
+                        <label for="{{ field.name }}" class="form-label">{{ field.label }}</label>
+                        <input type="number" class="form-control" id="{{ field.name }}" name="{{ field.name }}" 
+                               value="{{ field.value }}"
+                               step="0.01" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="skills" class="form-label">Skills (comma separated)</label>
-                        <input type="text" class="form-control" id="skills" name="skills" 
-                               placeholder="Python, SQL, Machine Learning" required>
-                    </div>
+                    {% endfor %}
                     <button type="submit" class="btn-predict">
                         <i class="bi bi-search"></i> Predict Placement
                     </button>
@@ -150,8 +161,16 @@
                     <div class="student-details">
                         <strong>Student Details:</strong><br>
                         ID: {{ student_data.student_id }}<br>
-                        CGPA: {{ student_data.cgpa }}<br>
-                        Skills: {{ student_data.skills }}
+                        {% for label, value in student_details %}
+                            {{ label }}: {{ value }}<br>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'download_report' %}?type=individual_student&student_id={{ student_data.student_id }}&format=pdf" 
+                           class="btn btn-outline-primary" target="_blank">
+                            <i class="bi bi-file-earmark-pdf"></i> Generate Student Report
+                        </a>
                     </div>
                 </div>
                 {% endif %}

@@ -29,6 +29,10 @@ class PlacementPredictor:
     def preprocess_data(self, df, fit=False):
         """Preprocess the data for training or prediction"""
         data = df.copy()
+
+        # Drop columns that should not be used as model features
+        if 'student_id' in data.columns:
+            data = data.drop(columns=['student_id'])
         
         # Handle categorical variables
         categorical_cols = data.select_dtypes(include=['object']).columns
@@ -36,10 +40,15 @@ class PlacementPredictor:
             if col != 'placement_status':  # Target variable
                 if fit:
                     self.label_encoders[col] = LabelEncoder()
-                    data[col] = self.label_encoders[col].fit_transform(data[col])
+                    data[col] = self.label_encoders[col].fit_transform(data[col].astype(str))
                 else:
                     if col in self.label_encoders:
-                        data[col] = self.label_encoders[col].transform(data[col])
+                        data[col] = self.safe_transform(data[col].astype(str), self.label_encoders[col])
+
+        # Convert remaining object columns to numeric where possible
+        remaining_object_cols = [col for col in data.select_dtypes(include=['object']).columns if col != 'placement_status']
+        for col in remaining_object_cols:
+            data[col] = pd.to_numeric(data[col], errors='coerce')
         
         # Handle missing values
         data = data.fillna(data.mean())
@@ -53,7 +62,14 @@ class PlacementPredictor:
         else:
             X = data
             y = None
-            
+
+        # Align prediction data with training features
+        if not fit and self.feature_names is not None:
+            for feature in self.feature_names:
+                if feature not in X.columns:
+                    X[feature] = np.nan
+            X = X[self.feature_names]
+        
         # Scale numerical features
         if fit:
             X_scaled = self.scaler.fit_transform(X)
@@ -61,6 +77,16 @@ class PlacementPredictor:
             X_scaled = self.scaler.transform(X)
             
         return X_scaled, y
+
+    def safe_transform(self, series, encoder):
+        transformed = []
+        known_labels = set(encoder.classes_)
+        for value in series:
+            if value in known_labels:
+                transformed.append(int(encoder.transform([value])[0]))
+            else:
+                transformed.append(-1)
+        return pd.Series(transformed, index=series.index)
     
     def train_model(self, df, model_name='random_forest'):
         """Train the selected model"""

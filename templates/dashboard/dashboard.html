@@ -25,7 +25,7 @@
             left: 0;
             top: 0;
             height: 100%;
-            width: 260px;
+            width: 200px;
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
             transition: all 0.3s;
@@ -54,7 +54,7 @@
         }
         
         .sidebar-menu .menu-item {
-            padding: 12px 25px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             color: rgba(255,255,255,0.8);
@@ -81,20 +81,24 @@
         
         /* Main Content */
         .main-content {
-            margin-left: 260px;
+            margin-left: 200px;
             padding: 20px;
+            position: relative;
+            min-height: calc(100vh - 40px);
         }
         
         /* Top Bar */
         .top-bar {
             background: white;
-            padding: 15px 30px;
+            padding: 15px 25px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
         
         .welcome-text h2 {
@@ -121,20 +125,39 @@
         .logout-btn {
             background: #dc3545;
             color: white;
-            padding: 8px 20px;
+            padding: 6px 14px;
             border-radius: 5px;
             text-decoration: none;
             transition: all 0.3s;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
         
         .logout-btn:hover {
             background: #c82333;
             color: white;
         }
-        
+
+        .refresh-button {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.25s ease;
+        }
+
+        .refresh-button:hover {
+            background: #2b82d5;
+        }
+
         /* Stats Cards */
         .stats-grid {
             display: grid;
@@ -183,7 +206,7 @@
         .feature-card {
             background: white;
             border-radius: 10px;
-            padding: 25px;
+            padding: 22px;
             text-align: center;
             text-decoration: none;
             color: #333;
@@ -290,6 +313,28 @@
                 margin-left: 70px;
             }
         }
+        .sidebar-summary {
+            padding: 16px 14px 24px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+        .sidebar-summary-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            color: white;
+            min-height: 68px;
+        }
+        .sidebar-summary-item h4 {
+            margin: 0 0 4px;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .sidebar-summary-item p {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -298,6 +343,32 @@
         <div class="sidebar-header">
             <h3>Student Placement Predictor System</h3>
             <p>ML-Based System</p>
+        </div>
+        <div class="sidebar-summary">
+            <div class="sidebar-summary-item">
+                <h4>Total Students</h4>
+                <p id="total-students">0</p>
+            </div>
+            <div class="sidebar-summary-item">
+                <h4>Placed Students</h4>
+                <p id="placed-students">0</p>
+            </div>
+            <div class="sidebar-summary-item">
+                <h4>Placement Rate</h4>
+                <p id="placement-rate">0%</p>
+            </div>
+            <div class="sidebar-summary-item">
+                <h4>Average CGPA</h4>
+                <p id="avg-cgpa">0.0</p>
+            </div>
+            <div class="sidebar-summary-item">
+                <h4>Data Source</h4>
+                <p id="data-source">Sample</p>
+            </div>
+            <div class="sidebar-summary-item">
+                <h4>Model Status</h4>
+                <p id="model-status">Not Trained</p>
+            </div>
         </div>
         <div class="sidebar-menu">
             <a href="{% url 'dashboard' %}" class="menu-item active">
@@ -339,56 +410,8 @@
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
             </div>
-            <div class="top-actions">
-                <button id="refresh-stats" class="logout-btn" style="background: #3498db;">Refresh Stats</button>
-            </div>
         </div>
-        
-        <!-- Statistics Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <div class="stat-value" id="total-students">0</div>
-                <div class="stat-label">Total Students</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <div class="stat-value" id="placed-students">0</div>
-                <div class="stat-label">Placed Students</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-graph-up"></i>
-                </div>
-                <div class="stat-value" id="placement-rate">0%</div>
-                <div class="stat-label">Placement Rate</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-star-fill"></i>
-                </div>
-                <div class="stat-value" id="avg-cgpa">0.0</div>
-                <div class="stat-label">Average CGPA</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-database-fill"></i>
-                </div>
-                <div class="stat-value" id="data-source">Sample</div>
-                <div class="stat-label">Data Source</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="bi bi-cpu-fill"></i>
-                </div>
-                <div class="stat-value" id="model-status">Not Trained</div>
-                <div class="stat-label">Model Status</div>
-            </div>
-        </div>
+        <button id="refresh-stats" class="refresh-button">Refresh Stats</button>
         
         <!-- Features -->
         <h3><i class="bi bi-rocket"></i> Quick Actions</h3>
@@ -407,6 +430,11 @@
                 <div class="feature-icon">🔮</div>
                 <h3>Make Predictions</h3>
                 <p>Predict placement chances</p>
+            </a>
+            <a href="{% url 'prediction_history' %}" class="feature-card">
+                <div class="feature-icon">📜</div>
+                <h3>Prediction History</h3>
+                <p>Review saved placement predictions</p>
             </a>
             <a href="{% url 'generate_report' %}" class="feature-card">
                 <div class="feature-icon">📄</div>
@@ -429,8 +457,58 @@
                     <p id="model-updated">N/A</p>
                 </div>
                 <div class="insight-card">
+                    <h4>Total Predictions</h4>
+                    <p id="prediction-count">0</p>
+                </div>
+                <div class="insight-card">
+                    <h4>Last Prediction</h4>
+                    <p id="last-prediction">N/A</p>
+                </div>
+                <div class="insight-card">
                     <h4>Feature Count</h4>
                     <p id="feature-count">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 30px;">
+            <div class="card-header" style="background: linear-gradient(135deg, #20c997 0%, #0d6efd 100%); color: white; border-radius: 10px 10px 0 0; padding: 15px 20px;">
+                <h3 style="margin: 0;"><i class="bi bi-list-check"></i> Recent Prediction Records</h3>
+            </div>
+            <div class="card-body" style="padding: 20px;">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Student ID</th>
+                                <th>Prediction</th>
+                                <th>Confidence</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recent_predictions %}
+                                {% for record in recent_predictions %}
+                                    <tr>
+                                        <td>{{ record.timestamp }}</td>
+                                        <td>{{ record.student_id }}</td>
+                                        <td>{{ record.prediction }}</td>
+                                        <td>{{ record.confidence|floatformat:1 }}%</td>
+                                        <td>
+                                            <a href="{% url 'download_report' %}?type=individual_student&student_id={{ record.student_id }}&format=pdf" class="btn btn-sm btn-primary" target="_blank">
+                                                <i class="bi bi-file-earmark-pdf"></i> Report
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No prediction records found yet.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -493,6 +571,8 @@
                     $('#dataset-updated').text(data.dataset_updated_at);
                     $('#model-updated').text(data.model_updated_at);
                     $('#feature-count').text(data.feature_count);
+                    $('#prediction-count').text(data.prediction_count);
+                    $('#last-prediction').text(data.last_prediction);
                     
                     // Update chart
                     if (window.placementChartInstance) {
