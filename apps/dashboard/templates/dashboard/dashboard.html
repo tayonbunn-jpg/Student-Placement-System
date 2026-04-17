@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Student Placement Dashboard</h1>
+    <div id="charts"></div>
+
+    <script>
+        fetch("{% url 'get_visualizations' %}")
+        .then(response => response.json())
+        .then(data => {
+            const chartsDiv = document.getElementById('charts');
+            for (const key in data) {
+                const img = document.createElement('img');
+                img.src = "data:image/png;base64," + data[key];
+                img.style = "margin:10px; max-width:600px;";
+                chartsDiv.appendChild(img);
+            }
+        })
+        .catch(err => console.error(err));
+    </script>
+</body>
+</html>

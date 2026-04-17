@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preprocess Data - Placement Prediction System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f2f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Preprocessing</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label>Handle Missing Values:</label>
+            <select name="handle_missing">
+                <option value="drop">Drop rows with missing values</option>
+                <option value="mean">Fill with mean</option>
+                <option value="median">Fill with median</option>
+            </select>
+            
+            <label>Scaling Method:</label>
+            <select name="scaling">
+                <option value="standard">Standard Scaling</option>
+                <option value="minmax">Min-Max Scaling</option>
+                <option value="none">No Scaling</option>
+            </select>
+            
+            <button type="submit">Apply Preprocessing</button>
+        </form>
+        <a href="{% url 'upload_data' %}" class="back-link">Back to Upload</a>
+    </div>
+</body>
+</html>

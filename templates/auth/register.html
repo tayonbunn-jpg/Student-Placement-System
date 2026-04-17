@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Student Placement Prediction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .register-header h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .register-header p {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group .helptext {
+            display: none;
+        }
+        
+        .error-field {
+            border-color: #dc3545 !important;
+            background-color: #fff !important;
+        }
+        
+        .help-requirements {
+            margin-top: 10px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+        }
+        
+        .help-requirements h4 {
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin: 6px 0;
+            padding: 4px 0;
+        }
+        
+        .requirement-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .requirement-icon.unchecked {
+            background-color: #e0e0e0;
+            color: #999;
+        }
+        
+        .requirement-icon.checked {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .requirement-text {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .requirement-text.met {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .errorlist {
+            color: #dc3545;
+            list-style: none;
+            margin-top: 8px;
+            font-size: 13px;
+            padding: 8px 12px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            border-left: 3px solid #dc3545;
+        }
+        
+        .errorlist li {
+            margin: 4px 0;
+        }
+        
+        .form-group ul {
+            list-style: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .form-divider {
+            text-align: center;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            color: #ccc;
+        }
+        
+        .login-link {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: #764ba2;
+        }
+        
+        .field-error {
+            border-color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h2>Create Account</h2>
+            <p>Join the Student Placement Prediction System</p>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post" id="registerForm">
+            {% csrf_token %}
+            
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="errorlist">
+                        {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="help-requirements">
+                    <h4>Username requirements:</h4>
+                    <div class="requirement">
+                        <span class="requirement-icon unchecked">✓</span>
+                        <span class="requirement-text">150 characters or fewer</span>
+                    </div>
+                    <div class="requirement">
+                        <span class="requirement-icon unchecked">✓</span>
+                        <span class="requirement-text">Letters, digits, @, /, +, -, and _ only</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="errorlist">
+                        {% for error in form.password1.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="help-requirements">
+                    <h4>Password requirements:</h4>
+                    <div class="requirement">
+                        <span class="requirement-icon unchecked" id="req-length">✓</span>
+                        <span class="requirement-text" id="req-length-text">At least 8 characters</span>
+                    </div>
+                    <div class="requirement">
+                        <span class="requirement-icon unchecked" id="req-not-common">✓</span>
+                        <span class="requirement-text" id="req-not-common-text">Not a commonly used password</span>
+                    </div>
+                    <div class="requirement">
+                        <span class="requirement-icon unchecked" id="req-not-numeric">✓</span>
+                        <span class="requirement-text" id="req-not-numeric-text">Not entirely numeric</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Password Confirmation Field -->
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="errorlist">
+                        {% for error in form.password2.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button type="submit">Create Account</button>
+        </form>
+        
+        <div class="form-divider">or</div>
+        
+        <div class="login-link">
+            Already have an account? <a href="{% url 'login' %}">Sign in here</a>
+        </div>
+    </div>
+    
+    <script>
+        // Real-time password validation feedback
+        const passwordField = document.getElementById('{{ form.password1.id_for_label }}');
+        
+        if (passwordField) {
+            passwordField.addEventListener('input', function() {
+                const password = this.value;
+                
+                // Check length
+                const lengthMet = password.length >= 8;
+                updateRequirement('req-length', lengthMet);
+                
+                // Check if not entirely numeric
+                const notNumeric = !/^\d+$/.test(password);
+                updateRequirement('req-not-numeric', notNumeric);
+            });
+        }
+        
+        function updateRequirement(elementId, isMet) {
+            const icon = document.getElementById(elementId);
+            const textElement = document.getElementById(elementId + '-text');
+            
+            if (icon && textElement) {
+                if (isMet) {
+                    icon.className = 'requirement-icon checked';
+                    icon.textContent = '✓';
+                    textElement.classList.add('met');
+                } else {
+                    icon.className = 'requirement-icon unchecked';
+                    icon.textContent = '✓';
+                    textElement.classList.remove('met');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

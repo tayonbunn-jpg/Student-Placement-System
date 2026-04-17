@@ -1,0 +1,1 @@
+web: gunicorn placement_system.wsgi:application
