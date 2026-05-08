@@ -8,609 +8,634 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f4f6f9;
         }
-        
-        /* Sidebar Styles */
+
+        /* ── Sidebar ── */
         .sidebar {
             position: fixed;
-            left: 0;
-            top: 0;
+            left: 0; top: 0;
             height: 100%;
-            width: 200px;
+            width: 220px;
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            transition: all 0.3s;
             z-index: 1000;
+            overflow-y: auto;
+            transition: width 0.3s;
         }
-        
+
         .sidebar-header {
-            padding: 20px;
+            padding: 18px 14px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
         }
-        
-        .sidebar-header h3 {
-            margin: 0;
-            font-size: 1.3rem;
+        .sidebar-header h3 { font-size: 1.1rem; margin: 0; line-height: 1.3; }
+        .sidebar-header p  { font-size: 0.75rem; opacity: .8; margin: 4px 0 0; }
+
+        /* Sidebar stats */
+        .sidebar-summary { padding: 12px 10px 10px; }
+        .sidebar-summary-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            color: white;
         }
-        
-        .sidebar-header p {
-            font-size: 0.8rem;
-            opacity: 0.8;
-            margin: 5px 0 0;
-        }
-        
-        .sidebar-menu {
-            padding: 20px 0;
-        }
-        
+        .sidebar-summary-item h4 { font-size: 0.72rem; color: rgba(255,255,255,.8); margin: 0 0 2px; }
+        .sidebar-summary-item p  { font-size: 0.95rem; font-weight: 600; margin: 0; }
+
+        /* Sidebar nav */
+        .sidebar-menu { padding: 8px 0 20px; border-top: 1px solid rgba(255,255,255,0.12); }
         .sidebar-menu .menu-item {
             padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            color: rgba(255,255,255,0.8);
+            display: flex; align-items: center;
+            color: rgba(255,255,255,.8);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all .25s;
         }
-        
-        .sidebar-menu .menu-item:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding-left: 30px;
-        }
-        
-        .sidebar-menu .menu-item.active {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border-left: 4px solid #ffd700;
-        }
-        
-        .sidebar-menu .menu-item i {
-            width: 30px;
-            font-size: 1.2rem;
-        }
-        
-        /* Main Content */
+        .sidebar-menu .menu-item:hover { background: rgba(255,255,255,.12); color: white; padding-left: 26px; }
+        .sidebar-menu .menu-item.active { background: rgba(255,255,255,.2); color: white; border-left: 4px solid #ffd700; }
+        .sidebar-menu .menu-item i { width: 28px; font-size: 1.1rem; }
+
+        /* ── Main ── */
         .main-content {
-            margin-left: 200px;
-            padding: 20px;
-            position: relative;
-            min-height: calc(100vh - 40px);
+            margin-left: 220px;
+            padding: 20px 24px;
+            min-height: 100vh;
         }
-        
-        /* Top Bar */
+
+        /* ── Top Bar ── */
         .top-bar {
             background: white;
-            padding: 15px 25px;
+            padding: 14px 22px;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.08);
+            margin-bottom: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
             flex-wrap: wrap;
+            gap: 12px;
         }
-        
-        .welcome-text h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #333;
-        }
-        
-        .welcome-text p {
-            margin: 5px 0 0;
-            color: #666;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        /* Logout button as a form (POST) to avoid 405 error */
-        .logout-form {
-            display: inline;
-        }
+        .welcome-text h2 { font-size: 1.35rem; color: #333; margin: 0; }
+        .welcome-text p  { font-size: 0.85rem; color: #666; margin: 3px 0 0; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .logout-form { display: inline; }
         .logout-btn {
-            background: #dc3545;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 0.95rem;
+            background: #dc3545; color: white;
+            padding: 6px 14px; border-radius: 6px;
+            border: none; cursor: pointer; font-size: .9rem;
+            transition: background .2s;
         }
-        
-        .logout-btn:hover {
-            background: #c82333;
-            color: white;
-        }
+        .logout-btn:hover { background: #b02a37; }
 
+        /* ── Carousel (right under top bar) ── */
+        .carousel-wrap {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,.12);
+            margin-bottom: 22px;
+        }
+        .carousel-wrap .carousel-item img {
+            height: 300px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .carousel-caption h3 { font-size: 1.3rem; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+        .carousel-caption p  { font-size: .9rem; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
+
+        /* ── Refresh button ── */
         .refresh-button {
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-            background: #3498db;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: all 0.25s ease;
+            background: #b9cedc;
+            color: #1c0deb;
+            padding: 7px 16px;
+            border: none; border-radius: 6px;
+            cursor: pointer; font-size: .88rem;
+            margin-bottom: 16px;
+            transition: background .2s;
         }
+        .refresh-button:hover { background: #2b82d5; color: white; }
 
-        .refresh-button:hover {
-            background: #2b82d5;
-        }
-
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card .stat-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        
-        .stat-card .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .stat-card .stat-label {
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        /* Feature Cards */
+        /* ── Quick Actions ── */
+        .section-title { font-size: 1.15rem; color: #333; margin-bottom: 14px; }
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 16px;
+            margin-bottom: 26px;
         }
-        
         .feature-card {
             background: white;
             border-radius: 10px;
-            padding: 22px;
+            padding: 20px 16px;
             text-align: center;
             text-decoration: none;
             color: #333;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,.07);
+            transition: all .25s;
         }
-        
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,.13);
             color: #3498db;
         }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        
-        .feature-card h3 {
-            margin: 10px 0;
-            font-size: 1.3rem;
-        }
-        
-        .feature-card p {
-            color: #666;
-            margin: 0;
-        }
-        
-        /* Chart Container */
+        .feature-icon { font-size: 2.4rem; margin-bottom: 10px; }
+        .feature-card h3 { font-size: 1rem; margin: 6px 0 4px; }
+        .feature-card p  { color: #777; font-size: .82rem; margin: 0; }
+
+        /* ── Chart Section ── */
         .chart-container {
             background: white;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 26px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.07);
         }
-        
-        .chart-container h3 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .chart-container h3 { font-size: 1.1rem; color: #333; margin-bottom: 16px; }
         .insights-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
         }
-
         .insight-card {
             background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 12px;
             text-align: center;
             border: 1px solid #e9ecef;
         }
+        .insight-card h4 { font-size: .82rem; color: #666; margin: 0 0 6px; }
+        .insight-card p  { font-size: 1rem; font-weight: 600; color: #222; margin: 0; }
 
-        .insight-card h4 {
-            margin: 0 0 10px;
-            font-size: 1rem;
-            color: #555;
-        }
-
-        .insight-card p {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #111;
-        }
-        
-        /* Team Section Styles */
-        .team-section {
-            margin-top: 40px;
-        }
-        
-        .team-member {
-            transition: transform 0.3s;
-        }
-        
-        .team-member:hover {
-            transform: translateY(-5px);
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-            }
-            .sidebar-header h3, .sidebar-header p {
-                display: none;
-            }
-            .sidebar-menu .menu-item span {
-                display: none;
-            }
-            .sidebar-menu .menu-item i {
-                font-size: 1.5rem;
-            }
-            .main-content {
-                margin-left: 70px;
-            }
-        }
-        .sidebar-summary {
-            padding: 16px 14px 24px;
-            border-top: 1px solid rgba(255,255,255,0.12);
-        }
-        .sidebar-summary-item {
-            background: rgba(255,255,255,0.1);
+        /* ── Recent Predictions table ── */
+        .card-section {
+            background: white;
             border-radius: 10px;
-            padding: 10px 12px;
-            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.07);
+            margin-bottom: 26px;
+            overflow: hidden;
+        }
+        .card-section-header {
+            background: linear-gradient(135deg, #20c997 0%, #0d6efd 100%);
             color: white;
-            min-height: 68px;
+            padding: 13px 20px;
         }
-        .sidebar-summary-item h4 {
-            margin: 0 0 4px;
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.85);
+        .card-section-header h3 { margin: 0; font-size: 1.05rem; }
+        .card-section-body { padding: 18px 20px; }
+
+        /* ── Team ── */
+        .team-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 13px 20px;
         }
-        .sidebar-summary-item p {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
+        .team-header h3 { margin: 0; font-size: 1.05rem; }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            padding: 18px 20px;
+        }
+        .team-member { text-align: center; padding: 12px; transition: transform .25s; }
+        .team-member:hover { transform: translateY(-4px); }
+        .team-member i { font-size: 2.6rem; color: #667eea; }
+        .team-member h4 { font-size: .95rem; margin: 8px 0 3px; color: #333; }
+        .team-member p  { font-size: .82rem; color: #777; margin: 0; }
+        .team-footer {
+            text-align: center;
+            padding: 12px 20px 16px;
+            border-top: 1px solid #eee;
+            color: #888;
+            font-size: .85rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-header h3,
+            .sidebar-header p,
+            .sidebar-summary,
+            .sidebar-menu .menu-item span { display: none; }
+            .sidebar-menu .menu-item i { font-size: 1.4rem; }
+            .main-content { margin-left: 68px; padding: 14px; }
+            .features-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Student Placement Predictor System</h3>
-            <p>ML-Based System</p>
+
+<!-- ════════════ SIDEBAR ════════════ -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3>Student Placement Predictor System</h3>
+        <p>ML-Based System</p>
+    </div>
+
+    <div class="sidebar-summary">
+        <div class="sidebar-summary-item">
+            <h4>Total Students</h4>
+            <p id="total-students">0</p>
         </div>
-        <div class="sidebar-summary">
-            <div class="sidebar-summary-item">
-                <h4>Total Students</h4>
-                <p id="total-students">0</p>
-            </div>
-            <div class="sidebar-summary-item">
-                <h4>Placed Students</h4>
-                <p id="placed-students">0</p>
-            </div>
-            <div class="sidebar-summary-item">
-                <h4>Placement Rate</h4>
-                <p id="placement-rate">0%</p>
-            </div>
-            <div class="sidebar-summary-item">
-                <h4>Average CGPA</h4>
-                <p id="avg-cgpa">0.0</p>
-            </div>
-            <div class="sidebar-summary-item">
-                <h4>Data Source</h4>
-                <p id="data-source">Sample</p>
-            </div>
-            <div class="sidebar-summary-item">
-                <h4>Model Status</h4>
-                <p id="model-status">Not Trained</p>
-            </div>
+        <div class="sidebar-summary-item">
+            <h4>Placed Students</h4>
+            <p id="placed-students">0</p>
         </div>
-        <div class="sidebar-menu">
-            <a href="{% url 'dashboard' %}" class="menu-item active">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="{% url 'upload_data' %}" class="menu-item">
-                <i class="bi bi-upload"></i>
-                <span>Upload Data</span>
-            </a>
-            <a href="{% url 'train_model' %}" class="menu-item">
-                <i class="bi bi-cpu"></i>
-                <span>Train Model</span>
-            </a>
-            <a href="{% url 'predict' %}" class="menu-item">
-                <i class="bi bi-magic"></i>
-                <span>Predict</span>
-            </a>
-            <a href="{% url 'generate_report' %}" class="menu-item">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Reports</span>
-            </a>
+        <div class="sidebar-summary-item">
+            <h4>Placement Rate</h4>
+            <p id="placement-rate">0%</p>
+        </div>
+        <div class="sidebar-summary-item">
+            <h4>Average CGPA</h4>
+            <p id="avg-cgpa">0.0</p>
+        </div>
+        <div class="sidebar-summary-item">
+            <h4>Data Source</h4>
+            <p id="data-source">Sample</p>
+        </div>
+        <div class="sidebar-summary-item">
+            <h4>Model Status</h4>
+            <p id="model-status">Not Trained</p>
         </div>
     </div>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="welcome-text">
-                <h2>Welcome back, {{ user.username }}!</h2>
-                <p>Here's what's happening with your placement predictions today.</p>
+
+    <div class="sidebar-menu">
+        <a href="{% url 'dashboard' %}" class="menu-item active">
+            <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+        </a>
+        <a href="{% url 'upload_data' %}" class="menu-item">
+            <i class="bi bi-upload"></i><span>Upload Data</span>
+        </a>
+        <a href="{% url 'train_model' %}" class="menu-item">
+            <i class="bi bi-cpu"></i><span>Train Model</span>
+        </a>
+        <a href="{% url 'predict' %}" class="menu-item">
+            <i class="bi bi-magic"></i><span>Predict</span>
+        </a>
+        <a href="{% url 'generate_report' %}" class="menu-item">
+            <i class="bi bi-file-earmark-text"></i><span>Reports</span>
+        </a>
+    </div>
+</div>
+
+<!-- ════════════ MAIN CONTENT ════════════ -->
+<div class="main-content">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="welcome-text">
+            <h2>Welcome back, {{ user.username }}!</h2>
+            <p>Here's what's happening with your placement predictions today.</p>
+        </div>
+        <div class="user-info">
+            <i class="bi bi-person-circle" style="font-size:1.5rem;"></i>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- IMAGE SLIDER — directly under top bar -->
+    <div class="carousel-wrap">
+        <div id="dashboardSlider" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#dashboardSlider" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#dashboardSlider" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#dashboardSlider" data-bs-slide-to="2"></button>
             </div>
-            <div class="user-info">
-                <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                <!-- Logout as POST form (fixes 405 error) -->
-                <form method="post" action="{% url 'logout' %}" class="logout-form">
-                    {% csrf_token %}
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/static/images/slide1.PNG" alt="Slide 1">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>From Education to Employment</h3>
+                        <p>Helping students achieve successful career placement opportunities</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/images/slide2.PNG" alt="Slide 2">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Machine Learning Powered Predictions</h3>
+                        <p>Smart analytics for accurate student placement forecasting</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/images/slide3.PNG" alt="Slide 3">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Connecting Students to Career Opportunities</h3>
+                        <p>Bridging academic success with professional employment pathways</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#dashboardSlider" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#dashboardSlider" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- REFRESH BUTTON -->
+    <button id="refresh-stats" class="refresh-button">
+        <i class="bi bi-arrow-clockwise"></i> Refresh Stats
+    </button>
+
+    <!-- QUICK ACTIONS -->
+    <h3 class="section-title"><i class="bi bi-rocket"></i> Quick Actions</h3>
+    <div class="features-grid">
+        <a href="{% url 'upload_data' %}" class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Upload Data</h3>
+            <p>Upload student records (CSV/Excel)</p>
+        </a>
+        <a href="{% url 'train_model' %}" class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>Train Model</h3>
+            <p>Train ML models for prediction</p>
+        </a>
+        <a href="{% url 'predict' %}" class="feature-card">
+            <div class="feature-icon">🔮</div>
+            <h3>Make Predictions</h3>
+            <p>Predict placement chances</p>
+        </a>
+        <a href="{% url 'prediction_history' %}" class="feature-card">
+            <div class="feature-icon">📜</div>
+            <h3>Prediction History</h3>
+            <p>Review saved placement predictions</p>
+        </a>
+        <a href="{% url 'generate_report' %}" class="feature-card">
+            <div class="feature-icon">📄</div>
+            <h3>Generate Reports</h3>
+            <p>Export results (PDF/Excel)</p>
+        </a>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-container">
+        <h3><i class="bi bi-bar-chart"></i> Placement Analytics</h3>
+        <canvas id="placementChart" style="max-height:280px;"></canvas>
+        <div class="insights-grid">
+            <div class="insight-card">
+                <h4>Data Last Updated</h4>
+                <p id="dataset-updated">N/A</p>
+            </div>
+            <div class="insight-card">
+                <h4>Model Last Trained</h4>
+                <p id="model-updated">N/A</p>
+            </div>
+            <div class="insight-card">
+                <h4>Total Predictions</h4>
+                <p id="prediction-count">0</p>
+            </div>
+            <div class="insight-card">
+                <h4>Last Prediction</h4>
+                <p id="last-prediction">N/A</p>
+            </div>
+            <div class="insight-card">
+                <h4>Feature Count</h4>
+                <p id="feature-count">0</p>
             </div>
         </div>
-        <button id="refresh-stats" class="refresh-button">Refresh Stats</button>
-        
-        <!-- Features -->
-        <h3><i class="bi bi-rocket"></i> Quick Actions</h3>
-        <div class="features-grid">
-            <a href="{% url 'upload_data' %}" class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Upload Data</h3>
-                <p>Upload student records (CSV/Excel)</p>
-            </a>
-            <a href="{% url 'train_model' %}" class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>Train Model</h3>
-                <p>Train ML models for prediction</p>
-            </a>
-            <a href="{% url 'predict' %}" class="feature-card">
-                <div class="feature-icon">🔮</div>
-                <h3>Make Predictions</h3>
-                <p>Predict placement chances</p>
-            </a>
-            <a href="{% url 'prediction_history' %}" class="feature-card">
-                <div class="feature-icon">📜</div>
-                <h3>Prediction History</h3>
-                <p>Review saved placement predictions</p>
-            </a>
-            <a href="{% url 'generate_report' %}" class="feature-card">
-                <div class="feature-icon">📄</div>
-                <h3>Generate Reports</h3>
-                <p>Export results (PDF/Excel)</p>
-            </a>
+    </div>
+
+    <!-- RECENT PREDICTIONS -->
+    <div class="card-section">
+        <div class="card-section-header">
+            <h3><i class="bi bi-list-check"></i> Recent Prediction Records</h3>
         </div>
-        
-        <!-- Chart Section -->
-        <div class="chart-container">
-            <h3><i class="bi bi-bar-chart"></i> Placement Analytics</h3>
-            <canvas id="placementChart" style="max-height: 300px;"></canvas>
-            <div class="insights-grid">
-                <div class="insight-card">
-                    <h4>Data Last Updated</h4>
-                    <p id="dataset-updated">N/A</p>
-                </div>
-                <div class="insight-card">
-                    <h4>Model Last Trained</h4>
-                    <p id="model-updated">N/A</p>
-                </div>
-                <div class="insight-card">
-                    <h4>Total Predictions</h4>
-                    <p id="prediction-count">0</p>
-                </div>
-                <div class="insight-card">
-                    <h4>Last Prediction</h4>
-                    <p id="last-prediction">N/A</p>
-                </div>
-                <div class="insight-card">
-                    <h4>Feature Count</h4>
-                    <p id="feature-count">0</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card" style="background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 30px;">
-            <div class="card-header" style="background: linear-gradient(135deg, #20c997 0%, #0d6efd 100%); color: white; border-radius: 10px 10px 0 0; padding: 15px 20px;">
-                <h3 style="margin: 0;"><i class="bi bi-list-check"></i> Recent Prediction Records</h3>
-            </div>
-            <div class="card-body" style="padding: 20px;">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>Student ID</th>
-                                <th>Prediction</th>
-                                <th>Confidence</th>
-                                <th>Actions</th>
+        <div class="card-section-body">
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Student ID</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="predictions-tbody">
+                        {% if recent_predictions %}
+                            {% for record in recent_predictions %}
+                            <tr id="row-{{ record.id }}">
+                                <td>{{ record.timestamp }}</td>
+                                <td>{{ record.student_id }}</td>
+                                <td>{{ record.prediction }}</td>
+                                <td>{{ record.confidence|floatformat:1 }}%</td>
+                                <td style="white-space:nowrap;">
+                                    <a href="{% url 'download_report' %}?type=individual_student&student_id={{ record.student_id }}&format=pdf"
+                                       class="btn btn-sm btn-primary" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf"></i> Report
+                                    </a>
+                                    <button class="btn btn-sm btn-danger ms-1 delete-prediction-btn"
+                                            data-id="{{ record.id }}"
+                                            data-student="{{ record.student_id }}"
+                                            data-ts="{{ record.timestamp }}">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% if recent_predictions %}
-                                {% for record in recent_predictions %}
-                                    <tr>
-                                        <td>{{ record.timestamp }}</td>
-                                        <td>{{ record.student_id }}</td>
-                                        <td>{{ record.prediction }}</td>
-                                        <td>{{ record.confidence|floatformat:1 }}%</td>
-                                        <td>
-                                            <a href="{% url 'download_report' %}?type=individual_student&student_id={{ record.student_id }}&format=pdf" class="btn btn-sm btn-primary" target="_blank">
-                                                <i class="bi bi-file-earmark-pdf"></i> Report
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No prediction records found yet.</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Team Members Section -->
-        <div class="team-section">
-            <div class="card" style="background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px 10px 0 0; padding: 15px 20px;">
-                    <h3 style="margin: 0;"><i class="bi bi-people-fill"></i> Developed By</h3>
-                </div>
-                <div class="card-body" style="padding: 20px;">
-                    <div class="team-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                        <div class="team-member" style="text-align: center; padding: 15px;">
-                            <i class="bi bi-person-circle" style="font-size: 3rem; color: #667eea;"></i>
-                            <h4 style="margin: 10px 0 5px; color: #333;">Joeson WOROME</h4>
-                            <p style="color: #666; margin: 0;">Project Lead & ML Engineer</p>
-                        </div>
-                        <div class="team-member" style="text-align: center; padding: 15px;">
-                            <i class="bi bi-person-circle" style="font-size: 3rem; color: #667eea;"></i>
-                            <h4 style="margin: 10px 0 5px; color: #333;">Gladys Kilavo</h4>
-                            <p style="color: #666; margin: 0;">Backend Developer</p>
-                        </div>
-                        <div class="team-member" style="text-align: center; padding: 15px;">
-                            <i class="bi bi-person-circle" style="font-size: 3rem; color: #667eea;"></i>
-                            <h4 style="margin: 10px 0 5px; color: #333;">Clifford WHITES</h4>
-                            <p style="color: #666; margin: 0;">Frontend Developer</p>
-                        </div>
-                        <div class="team-member" style="text-align: center; padding: 15px;">
-                            <i class="bi bi-person-circle" style="font-size: 3rem; color: #667eea;"></i>
-                            <h4 style="margin: 10px 0 5px; color: #333;">Tayon BUNN</h4>
-                            <p style="color: #666; margin: 0;">Data Scientist</p>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <p style="color: #666; margin: 0;">
-                            <i class="bi bi-calendar3"></i> March 2026 | 
-                            <i class="bi bi-github"></i> Student Placement Prediction System 
-                        </p>
-                    </div>
-                </div>
+                            {% endfor %}
+                        {% else %}
+                            <tr id="no-records-row">
+                                <td colspan="5" class="text-center text-muted py-3">No prediction records found yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Load dashboard statistics
-        function loadStats() {
+
+    <!-- TEAM -->
+    <div class="card-section">
+        <div class="team-header">
+            <h3><i class="bi bi-people-fill"></i> Developed By</h3>
+        </div>
+        <div class="team-grid">
+            <div class="team-member">
+                <i class="bi bi-person-circle"></i>
+                <h4>Joeson WOROME</h4>
+                <p>Project Lead & ML Engineer</p>
+            </div>
+            <div class="team-member">
+                <i class="bi bi-person-circle"></i>
+                <h4>Gladys Kilavo</h4>
+                <p>Backend Developer</p>
+            </div>
+            <div class="team-member">
+                <i class="bi bi-person-circle"></i>
+                <h4>Clifford WHITES</h4>
+                <p>Frontend Developer</p>
+            </div>
+            <div class="team-member">
+                <i class="bi bi-person-circle"></i>
+                <h4>Tayon BUNN</h4>
+                <p>Data Scientist</p>
+            </div>
+        </div>
+        <div class="team-footer">
+            <i class="bi bi-calendar3"></i> 2026 &nbsp;|&nbsp;
+            <i class="bi bi-github"></i> Student Placement Prediction System
+        </div>
+    </div>
+
+</div><!-- /main-content -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function loadStats() {
+        $.ajax({
+            url: "{% url 'dashboard_stats' %}",
+            method: 'GET',
+            success: function(data) {
+                $('#total-students').text(data.total_students);
+                $('#placed-students').text(data.placed_students);
+                $('#placement-rate').text(data.placement_rate + '%');
+                $('#avg-cgpa').text(data.avg_cgpa);
+                $('#data-source').text(data.data_source === 'uploaded' ? 'Uploaded' : 'Sample');
+                $('#model-status').text(data.model_status);
+                $('#dataset-updated').text(data.dataset_updated_at);
+                $('#model-updated').text(data.model_updated_at);
+                $('#feature-count').text(data.feature_count);
+                $('#prediction-count').text(data.prediction_count);
+                $('#last-prediction').text(data.last_prediction);
+
+                var placed   = data.placed_students;
+                var notPlaced = data.total_students - data.placed_students;
+
+                if (window.placementChartInstance) {
+                    window.placementChartInstance.data.datasets[0].data = [placed, notPlaced];
+                    window.placementChartInstance.update();
+                } else {
+                    window.placementChartInstance = new Chart(
+                        document.getElementById('placementChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Placed', 'Not Placed'],
+                            datasets: [{
+                                data: [placed, notPlaced],
+                                backgroundColor: ['#28a745', '#dc3545'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // ── Delete logic ──
+    var deleteRecordId = null;
+    var deleteModal    = null;
+
+    $(document).ready(function() {
+        loadStats();
+        $('#refresh-stats').on('click', loadStats);
+
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+        // Open modal on Delete button click
+        $(document).on('click', '.delete-prediction-btn', function() {
+            deleteRecordId = $(this).data('id');
+            $('#modal-student-id').text($(this).data('student'));
+            $('#modal-timestamp').text($(this).data('ts'));
+            deleteModal.show();
+        });
+
+        // Confirm delete
+        $('#confirmDeleteBtn').on('click', function() {
+            if (!deleteRecordId) return;
+
+            var $btn = $(this);
+            $btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Deleting…');
+
+            // Build URL using Django's url tag so it always matches urls.py
+            var deleteUrl = "{% url 'delete_prediction' record_id=0 %}".replace('/0/', '/' + deleteRecordId + '/');
+
             $.ajax({
-                url: "{% url 'dashboard_stats' %}",
-                method: 'GET',
-                success: function(data) {
-                    $('#total-students').text(data.total_students);
-                    $('#placed-students').text(data.placed_students);
-                    $('#placement-rate').text(data.placement_rate + '%');
-                    $('#avg-cgpa').text(data.avg_cgpa);
-                    $('#data-source').text(data.data_source === 'uploaded' ? 'Uploaded' : 'Sample');
-                    $('#model-status').text(data.model_status);
-                    $('#dataset-updated').text(data.dataset_updated_at);
-                    $('#model-updated').text(data.model_updated_at);
-                    $('#feature-count').text(data.feature_count);
-                    $('#prediction-count').text(data.prediction_count);
-                    $('#last-prediction').text(data.last_prediction);
-                    
-                    // Update chart
-                    if (window.placementChartInstance) {
-                        window.placementChartInstance.data.datasets[0].data = [data.placed_students, data.total_students - data.placed_students];
-                        window.placementChartInstance.update();
-                    } else {
-                        window.placementChartInstance = new Chart(document.getElementById('placementChart'), {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Placed', 'Not Placed'],
-                                datasets: [{
-                                    data: [data.placed_students, data.total_students - data.placed_students],
-                                    backgroundColor: ['#28a745', '#dc3545'],
-                                    borderWidth: 0
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: true,
-                                plugins: {
-                                    legend: {
-                                        position: 'bottom'
-                                    }
-                                }
+                url: deleteUrl,
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        deleteModal.hide();
+                        var savedId = deleteRecordId;
+                        deleteRecordId = null;
+                        var $row = $('#row-' + savedId);
+                        $row.fadeOut(400, function() {
+                            $row.remove();
+                            if ($('#predictions-tbody tr:visible').length === 0) {
+                                $('#predictions-tbody').html(
+                                    '<tr id="no-records-row"><td colspan="5" class="text-center text-muted py-3">No prediction records found yet.</td></tr>'
+                                );
                             }
                         });
+                        $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Yes, Delete');
+                    } else {
+                        deleteModal.hide();
+                        alert('Could not delete: ' + (response.error || 'Unknown error'));
+                        deleteRecordId = null;
+                        $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Yes, Delete');
                     }
+                },
+                error: function(xhr) {
+                    deleteModal.hide();
+                    var msg = 'Error deleting record.';
+                    try { msg += '\n' + JSON.parse(xhr.responseText).error; } catch(e) {
+                        msg += '\nStatus: ' + xhr.status + ' ' + xhr.statusText;
+                    }
+                    alert(msg);
+                    deleteRecordId = null;
+                    $btn.prop('disabled', false).html('<i class="bi bi-trash"></i> Yes, Delete');
                 }
             });
-        }
-        
-        // Load stats on page load
-        $(document).ready(function() {
-            loadStats();
-            $('#refresh-stats').on('click', function() {
-                loadStats();
-            });
         });
-    </script>
+    });
+</script>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px; overflow:hidden; border:none;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#dc3545,#a71d2a); color:white; border:none;">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:24px;">
+                <p class="mb-1">Are you sure you want to delete this prediction record?</p>
+                <div style="background:#f8f9fa; border-radius:8px; padding:12px; margin-top:12px; font-size:.9rem;">
+                    <div><strong>Student ID:</strong> <span id="modal-student-id"></span></div>
+                    <div class="mt-1"><strong>Timestamp:</strong> <span id="modal-timestamp"></span></div>
+                </div>
+                <p class="text-danger mt-3 mb-0" style="font-size:.85rem;">
+                    <i class="bi bi-info-circle"></i> This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer" style="border:none; padding:12px 24px 18px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash"></i> Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

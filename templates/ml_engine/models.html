@@ -93,7 +93,40 @@
                                 <small>F1 Score</small>
                             </div>
                         </div>
+                        {% if training_info.metrics.roc_auc %}
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <p class="mb-0"><strong>ROC AUC:</strong> {{ training_info.metrics.roc_auc|floatformat:3 }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
+                    {% if training_info.metrics.confusion_matrix %}
+                    <div class="metric-card">
+                        <h4>Confusion Matrix</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Predicted 0</th>
+                                    <th>Predicted 1</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Actual 0</th>
+                                    <td>{{ training_info.metrics.confusion_matrix.0.0 }}</td>
+                                    <td>{{ training_info.metrics.confusion_matrix.0.1 }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Actual 1</th>
+                                    <td>{{ training_info.metrics.confusion_matrix.1.0 }}</td>
+                                    <td>{{ training_info.metrics.confusion_matrix.1.1 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
                     {% endif %}
                     
                     {% if feature_importance %}

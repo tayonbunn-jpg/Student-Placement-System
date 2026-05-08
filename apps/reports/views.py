@@ -150,21 +150,28 @@ def generate_individual_student_report(df, format_type, student_id, request):
     if not student_id:
         return HttpResponse("Student ID is required", status=400)
     
-    # Find student in data
-    student_data = df[df['student_id'].astype(str) == str(student_id)]
-    if student_data.empty:
-        return HttpResponse(f"Student with ID {student_id} not found", status=404)
-    
-    student_info = student_data.iloc[0].to_dict()
-    
-    # Check for predictions
+    student_info = {}
     predictions_path = os.path.join(settings.MEDIA_ROOT, 'predictions.csv')
     prediction_info = {}
+
+    if 'student_id' in df.columns:
+        student_data = df[df['student_id'].astype(str) == str(student_id)]
+        if not student_data.empty:
+            student_info = student_data.iloc[0].to_dict()
+    
+    # Check for predictions
     if os.path.exists(predictions_path):
         pred_df = pd.read_csv(predictions_path)
-        student_pred = pred_df[pred_df['student_id'].astype(str) == str(student_id)]
-        if not student_pred.empty:
-            prediction_info = student_pred.iloc[-1].to_dict()  # Get latest prediction
+        if 'student_id' in pred_df.columns:
+            student_pred = pred_df[pred_df['student_id'].astype(str) == str(student_id)]
+            if not student_pred.empty:
+                prediction_info = student_pred.iloc[-1].to_dict()  # Get latest prediction
+                if not student_info:
+                    # If there is no student info in the main dataset, use prediction record as fallback
+                    student_info = student_pred.iloc[-1].to_dict()
+
+    if not student_info:
+        return HttpResponse(f"Student with ID {student_id} not found", status=404)
     
     if format_type == 'pdf':
         return generate_student_pdf_report(student_info, prediction_info)

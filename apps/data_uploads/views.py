@@ -14,10 +14,9 @@ def upload_data(request):
         if 'file' not in request.FILES:
             messages.error(request, 'Please select a file to upload.')
             return redirect('upload_data')
-        
+
         file = request.FILES['file']
-        
-        # Check file extension
+
         if file.name.endswith('.csv'):
             try:
                 df = pd.read_csv(file)
@@ -33,13 +32,11 @@ def upload_data(request):
         else:
             messages.error(request, 'Please upload CSV or Excel file only.')
             return redirect('upload_data')
-        
-        # Save the data
+
         os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
         data_path = os.path.join(settings.MEDIA_ROOT, 'student_data.csv')
         df.to_csv(data_path, index=False)
-        
-        # Log upload event
+
         ActivityLog.objects.create(
             user=request.user,
             action='upload_data',
@@ -51,8 +48,7 @@ def upload_data(request):
                 'has_target': 'placement_status' in df.columns
             }
         )
-        
-        # Store data info in session
+
         data_info = {
             'total_rows': len(df),
             'columns': df.columns.tolist(),
@@ -60,46 +56,37 @@ def upload_data(request):
             'has_target': 'placement_status' in df.columns
         }
         request.session['data_info'] = data_info
-        
-        # Calculate basic stats for preview
-        preview_data = df.head(10).to_dict('records')
-        request.session['preview_data'] = preview_data
-        
-        messages.success(request, f'✅ Data uploaded successfully! {len(df)} records loaded.')
-        
-        # Redirect to preprocessing
-        return redirect('preprocess_data')
-    
-    # GET request - show upload page
+        request.session['preview_data'] = df.head(10).to_dict('records')
+
+        messages.success(request, f'Data uploaded successfully! {len(df)} records loaded.')
+        return redirect('train_model')
+
     data_info = request.session.get('data_info', None)
     preview_data = request.session.get('preview_data', None)
-    
-    context = {
+
+    return render(request, 'data_upload/upload.html', {
         'data_info': data_info,
         'preview_data': preview_data
-    }
-    return render(request, 'data_upload/upload.html', context)
+    })
+
 
 @login_required
 def preprocess_data(request):
     data_path = os.path.join(settings.MEDIA_ROOT, 'student_data.csv')
-    
+
     if not os.path.exists(data_path):
         messages.error(request, 'No data found. Please upload data first.')
         return redirect('upload_data')
-    
+
     df = pd.read_csv(data_path)
-    
+
     if request.method == 'POST':
-        # Get preprocessing options
         handle_missing = request.POST.get('handle_missing', 'drop')
         scaling = request.POST.get('scaling', 'none')
         encoding = request.POST.get('encoding', 'label')
-        
-        # Track what was done
+
         preprocessing_steps = []
-        
-        # 1. Handle missing values
+
         if handle_missing == 'drop':
             before = len(df)
             df = df.dropna()
@@ -112,13 +99,11 @@ def preprocess_data(request):
                 if df[col].isnull().any():
                     df[col] = df[col].fillna(df[col].mean())
                     preprocessing_steps.append(f'Filled missing values in {col} with mean')
-        
-        # 2. Handle categorical encoding
+
         if encoding != 'none':
             categorical_cols = df.select_dtypes(include=['object']).columns
             if 'placement_status' in categorical_cols:
                 categorical_cols = [c for c in categorical_cols if c != 'placement_status']
-            
             for col in categorical_cols:
                 if encoding == 'label':
                     from sklearn.preprocessing import LabelEncoder
@@ -128,13 +113,11 @@ def preprocess_data(request):
                 elif encoding == 'onehot':
                     df = pd.get_dummies(df, columns=[col], prefix=col)
                     preprocessing_steps.append(f'One-hot encoded: {col}')
-        
-        # 3. Handle scaling
+
         if scaling != 'none':
             numeric_cols = df.select_dtypes(include=['number']).columns
             if 'placement_status' in numeric_cols:
                 numeric_cols = [c for c in numeric_cols if c != 'placement_status']
-            
             from sklearn.preprocessing import StandardScaler, MinMaxScaler
             if scaling == 'standard':
                 scaler = StandardScaler()
@@ -144,22 +127,19 @@ def preprocess_data(request):
                 scaler = MinMaxScaler()
                 df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
                 preprocessing_steps.append('Applied Min-Max Scaling to numeric features')
-        
-        # Save preprocessed data
+
         df.to_csv(data_path, index=False)
-        
-        # Store preprocessing info
+
         request.session['preprocessing_steps'] = preprocessing_steps
         request.session['preprocessed_data_info'] = {
             'total_rows': len(df),
             'columns': df.columns.tolist(),
             'has_target': 'placement_status' in df.columns
         }
-        
-        messages.success(request, '✅ Data preprocessing completed! ' + ' | '.join(preprocessing_steps))
+
+        messages.success(request, 'Data preprocessing completed! ' + ' | '.join(preprocessing_steps))
         return redirect('train_model')
-    
-    # GET request - show preprocessing page
+
     context = {
         'df_info': {
             'rows': len(df),

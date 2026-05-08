@@ -1,53 +1,65 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Student Placement Prediction System</title>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            /* Background Image + Overlay */
+            background:
+                linear-gradient(rgba(102, 126, 234, 0.45), rgba(118, 75, 162, 0.45)),
+                url("{% static 'images/background.PNG' %}");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-        
+
         .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 450px;
-        }
-        
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 450px;
+}
+
         .login-header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .login-header h1 {
             color: #333;
-            font-size: 28px;
-            margin-bottom: 4px;
+            font-size: 30px;
+            margin-bottom: 6px;
             font-weight: 700;
         }
-        
+
         .login-header p {
-            color: #999;
+            color: #888;
             font-size: 14px;
-            font-weight: normal;
         }
-        
+
         .error-message {
             background: #f8d7da;
             color: #721c24;
@@ -60,87 +72,7 @@
             align-items: center;
             gap: 10px;
         }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 15px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .form-group input::placeholder {
-            color: #ccc;
-        }
-        
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .form-divider {
-            text-align: center;
-            margin: 24px 0 16px 0;
-            color: #ccc;
-            font-size: 14px;
-        }
-        
-        .register-link {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .register-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        
-        .register-link a:hover {
-            color: #764ba2;
-        }
-        
+
         .info-box {
             background-color: #e7f3ff;
             border-left: 4px solid #2196F3;
@@ -150,65 +82,150 @@
             font-size: 13px;
             color: #1976D2;
         }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .form-group input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #F8FAFC;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4F46E5;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+        .form-group input::placeholder {
+            color: #bbb;
+        }
+
+        button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+        button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
+}
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .form-divider {
+            text-align: center;
+            margin: 24px 0 16px;
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        .register-link {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #764ba2;
+        }
     </style>
 </head>
+
 <body>
+
     <div class="login-container">
         <div class="login-header">
-            <h1>Welcome Back</h1>
+            <h1>Login Portal</h1>
             <p>Student Placement Prediction System</p>
         </div>
-        
+
         {% if form.errors %}
             <div class="error-message">
                 <span>⚠️</span>
                 <span>Invalid username or password. Please try again.</span>
             </div>
         {% endif %}
-        
+
         {% if next %}
             {% if user.is_authenticated %}
                 <div class="info-box">
-                    Your account doesn't have access to this page. Please login with an account that has the necessary permissions.
+                    Your account doesn't have access to this page.
+                    Please login with an account that has the necessary permissions.
                 </div>
             {% endif %}
         {% endif %}
-        
+
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
-            
+
             <div class="form-group">
                 <label for="id_username">Username</label>
-                <input 
-                    type="text" 
-                    name="username" 
-                    id="id_username" 
+                <input
+                    type="text"
+                    name="username"
+                    id="id_username"
                     placeholder="Enter your username"
-                    required 
+                    required
                     autofocus
                 >
             </div>
-            
+
             <div class="form-group">
                 <label for="id_password">Password</label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="id_password" 
+                <input
+                    type="password"
+                    name="password"
+                    id="id_password"
                     placeholder="Enter your password"
                     required
                 >
             </div>
-            
+
             <button type="submit">Sign In</button>
             <input type="hidden" name="next" value="{{ next }}">
         </form>
-        
+
         <div class="form-divider">or</div>
-        
+
         <div class="register-link">
-            Don't have an account? <a href="{% url 'register' %}">Create one here</a>
+            Don't have an account?
+            <a href="{% url 'register' %}">Register</a>
         </div>
     </div>
+
 </body>
 </html>
