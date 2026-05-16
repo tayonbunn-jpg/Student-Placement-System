@@ -4,42 +4,70 @@
     <title>Train Model - Placement Prediction System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
             margin: 20px;
-            background: #f0f2f5;
+            background: #0a0e27;
+            color: #00ff41;
         }
         .container {
             max-width: 600px;
             margin: auto;
-            background: white;
+            background: rgba(0, 255, 65, 0.03);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 0;
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
         }
         h1 {
-            color: #333;
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         select, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 1px solid #00ff41;
+            border-radius: 0;
+            background: rgba(0, 255, 65, 0.05);
+            color: #00ff41;
         }
         button {
-            background: #667eea;
-            color: white;
-            border: none;
+            background: #00ff41;
+            color: #0a0e27;
+            border: 1px solid #00ff41;
             cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
         }
         button:hover {
-            background: #764ba2;
+            background: #00cc33;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+        .alert {
+            border: 1px solid #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+            padding: 15px;
+            border-radius: 0;
         }
         .back-link {
             display: inline-block;
             margin-top: 20px;
-            color: #667eea;
+            color: #00ff41;
             text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .back-link:hover {
+            text-shadow: 0 0 8px #00ff41;
+        }
+        .btn {
+            color: #0a0e27 !important;
+            background: #00ff41 !important;
         }
     </style>
 </head>

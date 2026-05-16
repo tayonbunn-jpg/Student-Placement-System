@@ -6,8 +6,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f9;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #0a0e27;
+            color: #00ff41;
             margin: 0;
             padding: 20px;
         }
@@ -16,34 +17,48 @@
             margin: auto;
         }
         .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #00ff41;
+            border-radius: 0;
+            background: rgba(0, 255, 65, 0.03);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
         }
         .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px 10px 0 0;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 200, 255, 0.1) 100%);
+            color: #00ff41;
+            border-radius: 0;
+            border-bottom: 1px solid #00ff41;
             padding: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px #00ff41;
+            font-weight: bold;
         }
         .btn-predict {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #00ff41;
+            color: #0a0e27;
             width: 100%;
             padding: 10px;
-            border: none;
-            border-radius: 5px;
+            border: 1px solid #00ff41;
+            border-radius: 0;
             font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
         }
         .btn-predict:hover {
-            transform: translateY(-2px);
+            background: #00cc33;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
         }
         .result-card {
             margin-top: 20px;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 0;
             text-align: center;
             animation: slideIn 0.5s ease;
+            border: 1px solid #00ff41;
+            background: rgba(0, 255, 65, 0.1);
         }
         @keyframes slideIn {
             from {
@@ -56,48 +71,61 @@
             }
         }
         .placed {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
+            background: rgba(0, 255, 65, 0.15);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
         }
         .not-placed {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
+            background: rgba(255, 100, 100, 0.1);
+            border: 2px solid #ff6464;
+            color: #ff6464;
+            box-shadow: 0 0 20px rgba(255, 100, 100, 0.2);
         }
         .confidence-bar {
-            background: #e9ecef;
-            border-radius: 10px;
+            background: rgba(0, 255, 65, 0.1);
+            border-radius: 0;
             height: 30px;
             margin: 15px 0;
             overflow: hidden;
+            border: 1px solid #00ff41;
         }
         .confidence-fill {
-            background: linear-gradient(90deg, #28a745, #20c997);
+            background: linear-gradient(90deg, #00ff41, #00cc33);
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #0a0e27;
             font-weight: bold;
             transition: width 1s ease;
+            text-shadow: 0 0 2px #00ff41;
         }
         .back-link {
             display: inline-block;
             margin-top: 20px;
-            color: #667eea;
+            color: #00ff41;
             text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+        .back-link:hover {
+            text-shadow: 0 0 8px #00ff41;
         }
         .prediction-badge {
             font-size: 2rem;
             font-weight: bold;
             margin: 10px 0;
+            text-shadow: 0 0 10px #00ff41;
         }
         .student-details {
-            background: #f8f9fa;
+            background: rgba(0, 255, 65, 0.05);
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 0;
             margin-top: 15px;
+            border: 1px solid #00ff41;
+        }
         }
     </style>
 </head>

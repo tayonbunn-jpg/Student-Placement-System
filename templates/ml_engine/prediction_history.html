@@ -6,40 +6,84 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f9;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #0a0e27;
             margin: 0;
             padding: 20px;
+            color: #00ff41;
         }
         .container {
             max-width: 1000px;
             margin: auto;
         }
         .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #00ff41;
+            border-radius: 0;
+            background: rgba(0, 255, 65, 0.03);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
             margin-bottom: 20px;
         }
         .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px 10px 0 0;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(0, 200, 255, 0.1) 100%);
+            color: #00ff41;
+            border-radius: 0;
+            border-bottom: 1px solid #00ff41;
             padding: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        .card-header h2 {
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+            margin: 0;
+            font-weight: bold;
+        }
+        .card-header p {
+            color: #888888;
+            font-size: 0.9rem;
         }
         .table-responsive {
             margin-top: 20px;
         }
+        table {
+            color: #00ff41;
+            border-collapse: collapse;
+        }
+        th {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            text-shadow: 0 0 2px #00ff41;
+        }
+        td {
+            border: 1px solid #00ff41;
+            text-shadow: 0 0 2px #00ff41;
+        }
         .back-link {
             display: inline-block;
             margin-top: 20px;
-            color: #667eea;
+            color: #00ff41;
             text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .back-link:hover {
+            text-shadow: 0 0 8px #00ff41;
         }
         .no-history {
             text-align: center;
             padding: 40px;
-            color: #666;
+            color: #888888;
+        }
+        .badge {
+            background: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            text-shadow: 0 0 2px #00ff41;
         }
     </style>
 </head>
