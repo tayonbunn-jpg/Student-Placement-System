@@ -59,7 +59,7 @@ def upload_data(request):
         request.session['preview_data'] = df.head(10).to_dict('records')
 
         messages.success(request, f'Data uploaded successfully! {len(df)} records loaded.')
-        return redirect('train_model')
+        return redirect('list_models')
 
     data_info = request.session.get('data_info', None)
     preview_data = request.session.get('preview_data', None)
@@ -138,7 +138,7 @@ def preprocess_data(request):
         }
 
         messages.success(request, 'Data preprocessing completed! ' + ' | '.join(preprocessing_steps))
-        return redirect('train_model')
+        return redirect('list_models')
 
     context = {
         'df_info': {

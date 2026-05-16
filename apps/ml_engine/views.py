@@ -1,4 +1,5 @@
 import os
+import shutil
 import pandas as pd
 from datetime import datetime
 
@@ -42,9 +43,9 @@ def parse_numeric_input(value):
 
 @login_required
 def train_model(request):
-    model_path = os.path.join(settings.MEDIA_ROOT, 'placement_model.pkl')
-    # Use the file saved by the upload view
-    data_path = os.path.join(settings.MEDIA_ROOT, 'student_data.csv')
+    # Training is disabled in this deployment — use the pre-trained model.
+    messages.info(request, 'Training is disabled. The system uses a pre-trained model.')
+    return redirect('list_models')
 
     # Read data_info from session (set by upload_data view)
     data_info = request.session.get('data_info', None)
@@ -62,63 +63,8 @@ def train_model(request):
         except Exception:
             pass
 
-    if request.method == 'POST':
-        model_name = request.POST.get('algorithm', 'random_forest')
-        test_size = float(request.POST.get('test_size', 0.2))
-
-        if not os.path.exists(data_path):
-            messages.error(request, 'No data found. Please upload your dataset first.')
-            return redirect('upload_data')
-
-        try:
-            df = pd.read_csv(data_path)
-
-            if 'placement_status' not in df.columns:
-                messages.error(request, 'Dataset missing placement_status column. Please re-upload labeled data.')
-                return render(request, 'ml_engine/train.html', {'data_info': data_info})
-
-            predictor = PlacementPredictor()
-            metrics = predictor.train_model(df, test_size=test_size)
-            predictor.save_model(model_path)
-
-            # Save training info to session so template can show it
-            training_info = {
-                'algorithm': model_name,
-                'test_size': test_size,
-                'total_samples': len(df),
-                'features': predictor.feature_names or [],
-                'accuracy': round(metrics.get('accuracy', 0) * 100, 2),
-                'f1_score': round(metrics.get('f1_score', 0), 4),
-            }
-            request.session['training_info'] = training_info
-
-            ActivityLog.objects.create(
-                user=request.user,
-                action='train',
-                description=f'Trained {model_name} model on {len(df)} records',
-                metadata=metrics
-            )
-
-            messages.success(
-                request,
-                f'Model trained successfully on {len(df)} records. '
-                f'Accuracy: {training_info["accuracy"]}% | F1: {training_info["f1_score"]}'
-            )
-            return redirect('list_models')
-
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            messages.error(request, f'Training failed: {str(e)}')
-            return render(request, 'ml_engine/train.html', {'data_info': data_info})
-
-    # GET
-    training_info = request.session.get('training_info', None)
-
-    return render(request, 'ml_engine/train.html', {
-        'data_info': data_info,
-        'training_info': training_info,
-    })
+    # training endpoint intentionally disabled; users should not train models via the UI.
+    # Redirect handled above.
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -128,19 +74,29 @@ def train_model(request):
 @login_required
 def make_prediction(request):
     model_path = os.path.join(settings.MEDIA_ROOT, 'placement_model.pkl')
+    packaged_model = os.path.join(os.path.dirname(__file__), 'placement_model.pkl')
 
     predictor = PlacementPredictor()
 
     try:
-        if not os.path.exists(model_path):
-            messages.error(request, 'No trained model found. Please train a model first.')
-            return redirect('train_model')
-
-        predictor.load_model(model_path)
+        # Prefer model in MEDIA_ROOT; fall back to packaged pre-trained model.
+        if os.path.exists(model_path):
+            predictor.load_model(model_path)
+        elif os.path.exists(packaged_model):
+            predictor.load_model(packaged_model)
+            # ensure media directory exists and copy the packaged model there for consistency
+            try:
+                os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+                shutil.copy(packaged_model, model_path)
+            except Exception:
+                pass
+        else:
+            messages.error(request, 'No trained model found. The system expects a pre-trained model to be available.')
+            return redirect('list_models')
 
     except Exception as e:
-        messages.error(request, f'Model corrupted or incompatible. Please retrain. Error: {str(e)}')
-        return redirect('train_model')
+        messages.error(request, f'Model corrupted or incompatible. Please contact the administrator. Error: {str(e)}')
+        return redirect('list_models')
 
     feature_names = predictor.feature_names or []
     field_labels = {name: FIELD_LABELS.get(name, name.replace('_', ' ').title()) for name in feature_names}
@@ -257,7 +213,7 @@ def list_models(request):
             predictor = PlacementPredictor()
             predictor.load_model(model_path)
             feature_count = len(predictor.feature_names or [])
-            model_type = predictor.selected_model_name or 'Unknown'
+            model_type = predictor.best_model_name or 'Unknown'
         except Exception:
             feature_count = 'N/A'
             model_type = 'Unknown'

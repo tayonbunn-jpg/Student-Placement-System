@@ -11,7 +11,10 @@ import numpy as np
 import os
 import json
 from datetime import datetime
+from django.shortcuts import render
 
+def about(request):
+    return render(request, 'about.html')
 
 # -------------------------------
 # NUMPY JSON FIX
@@ -134,6 +137,7 @@ def delete_prediction(request, record_id):
 def get_dashboard_stats(request):
     data_file = os.path.join(settings.MEDIA_ROOT, "student_data.csv")
     model_path = os.path.join(settings.MEDIA_ROOT, "placement_model.pkl")
+    packaged_model = os.path.join(os.path.dirname(__file__), "placement_model.pkl")
     predictions_path = os.path.join(settings.MEDIA_ROOT, "predictions.csv")
 
     # default values
@@ -228,15 +232,16 @@ def get_dashboard_stats(request):
     # ---------------------------
     # MODEL STATUS
     # ---------------------------
-    model_exists = os.path.exists(model_path)
+    model_exists = os.path.exists(model_path) or os.path.exists(packaged_model)
     model_status = "AI Trained" if model_exists else "AI Not Trained"
 
-    model_updated_at = (
-        datetime.fromtimestamp(
-            os.path.getmtime(model_path)
-        ).strftime("%Y-%m-%d %H:%M:%S")
-        if model_exists else "N/A"
-    )
+    # Prefer MEDIA_ROOT model timestamp, fall back to packaged model
+    if os.path.exists(model_path):
+        model_updated_at = datetime.fromtimestamp(os.path.getmtime(model_path)).strftime("%Y-%m-%d %H:%M:%S")
+    elif os.path.exists(packaged_model):
+        model_updated_at = datetime.fromtimestamp(os.path.getmtime(packaged_model)).strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        model_updated_at = "N/A"
 
     # ---------------------------
     # PREDICTION HISTORY
